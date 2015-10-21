@@ -48,7 +48,7 @@
 #include <ecl/ecl.h>
 
 ECL_AnfisYawController::ECL_AnfisYawController() :
-	ECL_Controller("yaw"),
+    ECL_AnfisController("yaw"),
 	_coordinated_min_speed(1.0f),
 	_coordinated_method(0)
 {
@@ -165,16 +165,10 @@ float ECL_AnfisYawController::control_bodyrate_impl(const struct ECL_AnfisContro
 	}
 
 	/* get the usual dt estimate */
-	uint64_t dt_micros = ecl_elapsed_time(&_last_run);
-	_last_run = ecl_absolute_time();
-	float dt = (float)dt_micros * 1e-6f;
+    //uint64_t dt_micros = ecl_elapsed_time(&_last_run);
+    //_last_run = ecl_absolute_time();
+    //float dt = (float)dt_micros * 1e-6f;
 
-	/* lock integral for long intervals */
-	bool lock_integrator = ctl_data.lock_integrator;
-
-	if (dt_micros > 500000) {
-		lock_integrator = true;
-	}
 
 	/* input conditioning */
 	float airspeed = ctl_data.airspeed;
@@ -200,34 +194,9 @@ float ECL_AnfisYawController::control_bodyrate_impl(const struct ECL_AnfisContro
 
 	/* Calculate body angular rate error */
 	_rate_error = _bodyrate_setpoint - ctl_data.yaw_rate; //body angular rate error
+    _dif_rate_error = _rate_error - _last_rate_error;
+    _last_rate_error = _rate_error;
 
-	if (!lock_integrator && _k_i > 0.0f && airspeed > 0.5f * ctl_data.airspeed_min) {
-
-		float id = _rate_error * dt;
-
-		/*
-		 * anti-windup: do not allow integrator to increase if actuator is at limit
-		 */
-		if (_last_output < -1.0f) {
-			/* only allow motion to center: increase value */
-			id = math::max(id, 0.0f);
-
-		} else if (_last_output > 1.0f) {
-			/* only allow motion to center: decrease value */
-			id = math::min(id, 0.0f);
-		}
-
-		_integrator += id;
-	}
-
-	/* integrator limit */
-	//xxx: until start detection is available: integral part in control signal is limited here
-	float integrator_constrained = math::constrain(_integrator * _k_i, -_integrator_max, _integrator_max);
-
-	/* Apply PI rate controller and store non-limited output */
-	_last_output = (_bodyrate_setpoint * _k_ff + _rate_error * _k_p + integrator_constrained) * ctl_data.scaler *
-		       ctl_data.scaler;  //scaler is proportional to 1/airspeed
-	//warnx("yaw:_last_output: %.4f, _integrator: %.4f, _integrator_max: %.4f, airspeed %.4f, _k_i %.4f, _k_p: %.4f", (double)_last_output, (double)_integrator, (double)_integrator_max, (double)airspeed, (double)_k_i, (double)_k_p);
 
 
 	return math::constrain(_last_output, -1.0f, 1.0f);

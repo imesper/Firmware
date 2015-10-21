@@ -47,18 +47,18 @@
 #include <systemlib/err.h>
 #include <ecl/ecl.h>
 
-ECL_AnfisYawController::ECL_AnfisYawController() :
-    ECL_AnfisController("yaw"),
+ECL_YawController::ECL_YawController() :
+    ECL_Controller("yaw"),
 	_coordinated_min_speed(1.0f),
 	_coordinated_method(0)
 {
 }
 
-ECL_AnfisYawController::~ECL_AnfisYawController()
+ECL_YawController::~ECL_YawController()
 {
 }
 
-float ECL_AnfisYawController::control_attitude(const struct ECL_AnfisControlData &ctl_data)
+float ECL_YawController::control_attitude(const struct ECL_ControlData &ctl_data)
 {
 	switch (_coordinated_method) {
 	case COORD_METHOD_OPEN:
@@ -79,7 +79,7 @@ float ECL_AnfisYawController::control_attitude(const struct ECL_AnfisControlData
 	return _rate_setpoint;
 }
 
-float ECL_AnfisYawController::control_bodyrate(const struct ECL_AnfisControlData &ctl_data)
+float ECL_YawController::control_bodyrate(const ECL_ControlData &ctl_data)
 {
 	switch (_coordinated_method) {
 	case COORD_METHOD_OPEN:
@@ -98,7 +98,7 @@ float ECL_AnfisYawController::control_bodyrate(const struct ECL_AnfisControlData
 	return math::constrain(_last_output, -1.0f, 1.0f);
 }
 
-float ECL_AnfisYawController::control_attitude_impl_openloop(const struct ECL_AnfisControlData &ctl_data)
+float ECL_YawController::control_attitude_impl_openloop(const ECL_ControlData &ctl_data)
 {
 	/* Do not calculate control signal with bad inputs */
 	if (!(PX4_ISFINITE(ctl_data.roll) &&
@@ -153,7 +153,7 @@ float ECL_AnfisYawController::control_attitude_impl_openloop(const struct ECL_An
 	return _rate_setpoint;
 }
 
-float ECL_AnfisYawController::control_bodyrate_impl(const struct ECL_AnfisControlData &ctl_data)
+float ECL_YawController::control_bodyrate_impl(const struct ECL_ControlData &ctl_data)
 {
 	/* Do not calculate control signal with bad inputs */
 	if (!(PX4_ISFINITE(ctl_data.roll) && PX4_ISFINITE(ctl_data.pitch) && PX4_ISFINITE(ctl_data.pitch_rate) &&
@@ -200,6 +200,8 @@ float ECL_AnfisYawController::control_bodyrate_impl(const struct ECL_AnfisContro
 
 	/* Calculate body angular rate error */
 	_rate_error = _bodyrate_setpoint - ctl_data.yaw_rate; //body angular rate error
+    _dif_rate_error = _rate_error - _last_rate_error;
+    _last_rate_error = _rate_error;
 
 	if (!lock_integrator && _k_i > 0.0f && airspeed > 0.5f * ctl_data.airspeed_min) {
 
@@ -233,7 +235,7 @@ float ECL_AnfisYawController::control_bodyrate_impl(const struct ECL_AnfisContro
 	return math::constrain(_last_output, -1.0f, 1.0f);
 }
 
-float ECL_AnfisYawController::control_attitude_impl_accclosedloop(const struct ECL_AnfisControlData &ctl_data)
+float ECL_YawController::control_attitude_impl_accclosedloop(const struct ECL_ControlData &ctl_data)
 {
 	/* dont set a rate setpoint */
 	return 0.0f;

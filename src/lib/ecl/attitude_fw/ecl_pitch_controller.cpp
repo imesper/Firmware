@@ -47,18 +47,18 @@
 #include <mathlib/mathlib.h>
 #include <systemlib/err.h>
 
-ECL_AnfisPitchController::ECL_AnfisPitchController() :
-    ECL_AnfisController("pitch"),
+ECL_PitchController::ECL_PitchController() :
+    ECL_Controller("pitch"),
 	_max_rate_neg(0.0f),
 	_roll_ff(0.0f)
 {
 }
 
-ECL_AnfisPitchController::~ECL_AnfisPitchController()
+ECL_PitchController::~ECL_PitchController()
 {
 }
 
-float ECL_AnfisPitchController::control_attitude(const struct ECL_AnfisControlData &ctl_data)
+float ECL_PitchController::control_attitude(const struct ECL_ControlData &ctl_data)
 {
 
 	/* Do not calculate control signal with bad inputs */
@@ -91,7 +91,7 @@ float ECL_AnfisPitchController::control_attitude(const struct ECL_AnfisControlDa
 	return _rate_setpoint;
 }
 
-float ECL_AnfisPitchController::control_bodyrate(const struct ECL_AnfisControlData &ctl_data)
+float ECL_PitchController::control_bodyrate(const ECL_ControlData &ctl_data)
 {
 	/* Do not calculate control signal with bad inputs */
 	if (!(PX4_ISFINITE(ctl_data.roll) &&
@@ -183,6 +183,9 @@ float ECL_AnfisPitchController::control_bodyrate(const struct ECL_AnfisControlDa
 
 		_integrator += id;
 	}
+
+    _dif_rate_error = _rate_error - _last_rate_error;
+    _last_rate_error = _rate_error;
 
 	/* integrator limit */
 	//xxx: until start detection is available: integral part in control signal is limited here

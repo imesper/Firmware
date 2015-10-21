@@ -54,16 +54,16 @@
 
 #include "ecl_controller.h"
 
-class __EXPORT ECL_AnfisRollController :
-	public ECL_AnfisController
+class __EXPORT ECL_RollController :
+	public ECL_Controller
 {
 public:
-	ECL_AnfisRollController();
+    ECL_RollController();
 
-	~ECL_AnfisRollController();
+    ~ECL_RollController();
 
-	float control_attitude(const struct ECL_AnfisControlData &ctl_data);
-	float control_bodyrate(const struct ECL_AnfisControlData &ctl_data);
+    float control_attitude(const struct ECL_ControlData &ctl_data);
+    float control_bodyrate(const struct ECL_ControlData &ctl_data);
 };
 
 #endif // ECL_ROLL_CONTROLLER_H

@@ -37,7 +37,7 @@ px4_add_module(
 	COMPILE_FLAGS
                 -Os
 	SRCS
-                fw_anfis_att_control.cpp
+                fw_anfis_att_control_main.cpp
                 
 	DEPENDS
 		platforms__common

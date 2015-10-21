@@ -48,7 +48,7 @@
 #include <systemlib/err.h>
 
 ECL_AnfisRollController::ECL_AnfisRollController() :
-	ECL_Controller("roll")
+    ECL_AnfisController("roll")
 {
 }
 
@@ -95,51 +95,19 @@ float ECL_AnfisRollController::control_bodyrate(const ECL_AnfisControlData &ctl_
 	}
 
 	/* get the usual dt estimate */
-	uint64_t dt_micros = ecl_elapsed_time(&_last_run);
-	_last_run = ecl_absolute_time();
-	float dt = (float)dt_micros * 1e-6f;
-
-	/* lock integral for long intervals */
-	bool lock_integrator = ctl_data.lock_integrator;
-
-	if (dt_micros > 500000) {
-		lock_integrator = true;
-	}
+    //uint64_t dt_micros = ecl_elapsed_time(&_last_run);
+    //_last_run = ecl_absolute_time();
+    //float dt = (float)dt_micros * 1e-6f;
 
 	/* Transform setpoint to body angular rates (jacobian) */
 	_bodyrate_setpoint = _rate_setpoint - sinf(ctl_data.pitch) * ctl_data.yaw_rate_setpoint;
 
 	/* Calculate body angular rate error */
 	_rate_error = _bodyrate_setpoint - ctl_data.roll_rate; //body angular rate error
-
-	if (!lock_integrator && _k_i > 0.0f) {
-
-		float id = _rate_error * dt * ctl_data.scaler;
-
-		/*
-		* anti-windup: do not allow integrator to increase if actuator is at limit
-		*/
-		if (_last_output < -1.0f) {
-			/* only allow motion to center: increase value */
-			id = math::max(id, 0.0f);
-
-		} else if (_last_output > 1.0f) {
-			/* only allow motion to center: decrease value */
-			id = math::min(id, 0.0f);
-		}
-
-		_integrator += id;
-	}
-
-	/* integrator limit */
-	//xxx: until start detection is available: integral part in control signal is limited here
-	float integrator_constrained = math::constrain(_integrator * _k_i, -_integrator_max, _integrator_max);
-	//warnx("roll: _integrator: %.4f, _integrator_max: %.4f", (double)_integrator, (double)_integrator_max);
+    _dif_rate_error = _rate_error - _last_rate_error;
+    _last_rate_error = _rate_error;
 
 	/* Apply PI rate controller and store non-limited output */
-	_last_output = _bodyrate_setpoint * _k_ff * ctl_data.scaler +
-		       _rate_error * _k_p * ctl_data.scaler * ctl_data.scaler
-		       + integrator_constrained;  //scaler is proportional to 1/airspeed
 
 	return math::constrain(_last_output, -1.0f, 1.0f);
 }

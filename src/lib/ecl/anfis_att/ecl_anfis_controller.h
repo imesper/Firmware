@@ -75,7 +75,6 @@ struct ECL_AnfisControlData {
 	float airspeed_max;
     float airspeed;
 	float scaler;
-	bool lock_integrator;
 };
 
 class __EXPORT ECL_AnfisController

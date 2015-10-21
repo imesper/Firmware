@@ -54,16 +54,16 @@
 
 #include "ecl_controller.h"
 
-class __EXPORT ECL_AnfisPitchController :
-    public ECL_AnfisController
+class __EXPORT ECL_PitchController :
+    public ECL_Controller
 {
 public:
-    ECL_AnfisPitchController();
+    ECL_PitchController();
 
-    ~ECL_AnfisPitchController();
+    ~ECL_PitchController();
 
-    float control_attitude(const struct ECL_AnfisControlData &ctl_data);
-    float control_bodyrate(const struct ECL_AnfisControlData &ctl_data);
+    float control_attitude(const ECL_ControlData &ctl_data);
+    float control_bodyrate(const struct ECL_ControlData &ctl_data);
 
 	/* Additional Setters */
 	void set_max_rate_pos(float max_rate_pos)

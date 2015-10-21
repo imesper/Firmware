@@ -107,9 +107,9 @@ float ECL_AnfisPitchController::control_bodyrate(const ECL_AnfisControlData &ctl
 	}
 
 	/* get the usual dt estimate */
-	uint64_t dt_micros = ecl_elapsed_time(&_last_run);
-	_last_run = ecl_absolute_time();
-	float dt = (float)dt_micros * 1e-6f;
+    //uint64_t dt_micros = ecl_elapsed_time(&_last_run);
+    //_last_run = ecl_absolute_time();
+    //float dt = (float)dt_micros * 1e-6f;
 
 	/* Transform setpoint to body angular rates (jacobian) */
 	_bodyrate_setpoint = cosf(ctl_data.roll) * _rate_setpoint +
@@ -162,9 +162,7 @@ float ECL_AnfisPitchController::control_bodyrate(const ECL_AnfisControlData &ctl
 
 
 	/* Apply PI rate controller and store non-limited output */
-	_last_output = _bodyrate_setpoint * _k_ff * ctl_data.scaler +
-		       _rate_error * _k_p * ctl_data.scaler * ctl_data.scaler
-		       + integrator_constrained;  //scaler is proportional to 1/airspeed
+
 //	warnx("pitch: _integrator: %.4f, _integrator_max: %.4f, airspeed %.4f, _k_i %.4f, _k_p: %.4f", (double)_integrator, (double)_integrator_max, (double)airspeed, (double)_k_i, (double)_k_p);
 //	warnx("roll: _last_output %.4f", (double)_last_output);
 	return math::constrain(_last_output, -1.0f, 1.0f);

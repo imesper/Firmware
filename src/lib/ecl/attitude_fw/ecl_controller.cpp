@@ -51,7 +51,7 @@
 #include <stdio.h>
 #include <mathlib/mathlib.h>
 
-ECL_AnfisController::ECL_AnfisController(const char *name) :
+ECL_Controller::ECL_Controller(const char *name) :
 	_last_run(0),
 	_tc(0.1f),
 	_k_p(0.0f),
@@ -62,6 +62,8 @@ ECL_AnfisController::ECL_AnfisController(const char *name) :
 	_last_output(0.0f),
 	_integrator(0.0f),
 	_rate_error(0.0f),
+    _last_rate_error(0.0f),
+    _dif_rate_error(0.0f),
 	_rate_setpoint(0.0f),
 	_bodyrate_setpoint(0.0f),
 	_perf_name()
@@ -71,64 +73,64 @@ ECL_AnfisController::ECL_AnfisController(const char *name) :
 	_nonfinite_input_perf = perf_alloc(PC_COUNT, _perf_name);
 }
 
-ECL_AnfisController::~ECL_AnfisController()
+ECL_Controller::~ECL_Controller()
 {
 	perf_free(_nonfinite_input_perf);
 }
 
-void ECL_AnfisController::reset_integrator()
+void ECL_Controller::reset_integrator()
 {
 	_integrator = 0.0f;
 }
 
-void ECL_AnfisController::set_time_constant(float time_constant)
+void ECL_Controller::set_time_constant(float time_constant)
 {
 	if (time_constant > 0.1f && time_constant < 3.0f) {
 		_tc = time_constant;
 	}
 }
 
-void ECL_AnfisController::set_k_p(float k_p)
+void ECL_Controller::set_k_p(float k_p)
 {
 	_k_p = k_p;
 }
 
-void ECL_AnfisController::set_k_i(float k_i)
+void ECL_Controller::set_k_i(float k_i)
 {
 	_k_i = k_i;
 }
 
-void ECL_AnfisController::set_k_ff(float k_ff)
+void ECL_Controller::set_k_ff(float k_ff)
 {
 	_k_ff = k_ff;
 }
 
-void ECL_AnfisController::set_integrator_max(float max)
+void ECL_Controller::set_integrator_max(float max)
 {
 	_integrator_max = max;
 }
 
-void ECL_AnfisController::set_max_rate(float max_rate)
+void ECL_Controller::set_max_rate(float max_rate)
 {
 	_max_rate = max_rate;
 }
 
-float ECL_AnfisController::get_rate_error()
+float ECL_Controller::get_rate_error()
 {
 	return _rate_error;
 }
 
-float ECL_AnfisController::get_desired_rate()
+float ECL_Controller::get_desired_rate()
 {
 	return _rate_setpoint;
 }
 
-float ECL_AnfisController::get_desired_bodyrate()
+float ECL_Controller::get_desired_bodyrate()
 {
 	return _bodyrate_setpoint;
 }
 
-float ECL_AnfisController::constrain_airspeed(float airspeed, float minspeed, float maxspeed) {
+float ECL_Controller::constrain_airspeed(float airspeed, float minspeed, float maxspeed) {
 	float airspeed_result = airspeed;
 	if (!PX4_ISFINITE(airspeed)) {
 		/* airspeed is NaN, +- INF or not available, pick center of band */
