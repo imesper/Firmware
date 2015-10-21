@@ -203,14 +203,14 @@ void control_heading(const struct vehicle_global_position_s *pos, const struct p
 /* Main Thread */
 int anfis_control_thread_main(int argc, char *argv[])
 {
-    printf("");
+    //printf("");
     /* read arguments */
     bool verbose = false;
-   // int fp, fpw;
-    //char m_data[20] ;
-    //int res;
-    //char tmp[20];
-   // double output[2];
+   //int fp, fpw;
+   //char m_data[20] ;
+   //int res;
+   //char tmp[20];
+   //double output[2];
 
 
     //char * end;
@@ -237,9 +237,9 @@ int anfis_control_thread_main(int argc, char *argv[])
 
     //fp = open(PX4_ROOTFSDIR"/etc/params/data.trn", O_RDONLY);
 
-    //fpw = open(PX4_ROOTFSDIR"/fs/microsd/log/output.csv", O_CREAT | O_WRONLY | O_DSYNC);
+    //fpw = open(PX4_ROOTFSDIR"/fs/microsd/log/output1810_1.csv", O_CREAT | O_WRONLY | O_DSYNC);
 
-//    start_anfis(2, 4, PX4_ROOTFSDIR"/etc/params/para.fin");
+    //start_anfis(2, 4, PX4_ROOTFSDIR"/etc/params/para.fin");
 
 //    int j = 0;
 //    int count = 0;
@@ -379,6 +379,7 @@ int anfis_control_thread_main(int argc, char *argv[])
 
             /* only run controller if attitude changed */
             if (fds[1].revents & POLLIN) {
+
                 printf("Main Loop Action");
 
                 /* Check if there is a new position measurement or position setpoint */

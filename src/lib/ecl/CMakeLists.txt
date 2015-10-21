@@ -35,6 +35,14 @@ px4_add_module(
 	COMPILE_FLAGS
 		-Os
 	SRCS
+		anfis_att/anfis.c
+                anfis_att/datastru.c
+                anfis_att/forward.c
+                anfis_att/standard.c
+                anfis_att/ecl_anfis_controller.cpp
+		anfis_att/ecl_anfis_pitch_controller.cpp
+		anfis_att/ecl_anfis_roll_controller.cpp
+		anfis_att/ecl_anfis_yaw_controller.cpp
 		attitude_fw/ecl_controller.cpp
 		attitude_fw/ecl_pitch_controller.cpp
 		attitude_fw/ecl_roll_controller.cpp

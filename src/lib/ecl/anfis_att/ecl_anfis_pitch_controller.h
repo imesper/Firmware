@@ -32,8 +32,8 @@
  ****************************************************************************/
 
 /**
- * @file ecl_controller.cpp
- * Definition of base class for other controllers
+ * @file ecl_pitch_controller.h
+ * Definition of a simple orthogonal pitch PID controller.
  *
  * @author Lorenz Meier <lm@inf.ethz.ch>
  * @author Thomas Gubler <thomasgubler@gmail.com>
@@ -46,95 +46,44 @@
  *   Jonathan Challinger, 2012.
  */
 
-#include "ecl_controller.h"
+#ifndef ECL_PITCH_CONTROLLER_H
+#define ECL_PITCH_CONTROLLER_H
 
-#include <stdio.h>
-#include <mathlib/mathlib.h>
+#include <stdbool.h>
+#include <stdint.h>
 
-ECL_AnfisController::ECL_AnfisController(const char *name) :
-	_last_run(0),
-	_tc(0.1f),
-	_k_p(0.0f),
-	_k_i(0.0f),
-	_k_ff(0.0f),
-	_integrator_max(0.0f),
-	_max_rate(0.0f),
-	_last_output(0.0f),
-	_integrator(0.0f),
-	_rate_error(0.0f),
-	_rate_setpoint(0.0f),
-	_bodyrate_setpoint(0.0f),
-	_perf_name()
+#include "ecl_anfis_controller.h"
+
+class __EXPORT ECL_AnfisPitchController :
+    public ECL_AnfisController
 {
-	/* Init performance counter */
-	snprintf(_perf_name, sizeof(_perf_name), "fw att control %s nonfinite input", name);
-	_nonfinite_input_perf = perf_alloc(PC_COUNT, _perf_name);
-}
+public:
+    ECL_AnfisPitchController();
 
-ECL_AnfisController::~ECL_AnfisController()
-{
-	perf_free(_nonfinite_input_perf);
-}
+    ~ECL_AnfisPitchController();
 
-void ECL_AnfisController::reset_integrator()
-{
-	_integrator = 0.0f;
-}
+    float control_attitude(const struct ECL_AnfisControlData &ctl_data);
+    float control_bodyrate(const struct ECL_AnfisControlData &ctl_data);
 
-void ECL_AnfisController::set_time_constant(float time_constant)
-{
-	if (time_constant > 0.1f && time_constant < 3.0f) {
-		_tc = time_constant;
+	/* Additional Setters */
+	void set_max_rate_pos(float max_rate_pos)
+	{
+		_max_rate = max_rate_pos;
 	}
-}
 
-void ECL_AnfisController::set_k_p(float k_p)
-{
-	_k_p = k_p;
-}
-
-void ECL_AnfisController::set_k_i(float k_i)
-{
-	_k_i = k_i;
-}
-
-void ECL_AnfisController::set_k_ff(float k_ff)
-{
-	_k_ff = k_ff;
-}
-
-void ECL_AnfisController::set_integrator_max(float max)
-{
-	_integrator_max = max;
-}
-
-void ECL_AnfisController::set_max_rate(float max_rate)
-{
-	_max_rate = max_rate;
-}
-
-float ECL_AnfisController::get_rate_error()
-{
-	return _rate_error;
-}
-
-float ECL_AnfisController::get_desired_rate()
-{
-	return _rate_setpoint;
-}
-
-float ECL_AnfisController::get_desired_bodyrate()
-{
-	return _bodyrate_setpoint;
-}
-
-float ECL_AnfisController::constrain_airspeed(float airspeed, float minspeed, float maxspeed) {
-	float airspeed_result = airspeed;
-	if (!PX4_ISFINITE(airspeed)) {
-		/* airspeed is NaN, +- INF or not available, pick center of band */
-		airspeed_result = 0.5f * (minspeed + maxspeed);
-	} else if (airspeed < minspeed) {
-		airspeed_result = minspeed;
+	void set_max_rate_neg(float max_rate_neg)
+	{
+		_max_rate_neg = max_rate_neg;
 	}
-	return airspeed_result;
-}
+
+	void set_roll_ff(float roll_ff)
+	{
+		_roll_ff = roll_ff;
+	}
+
+protected:
+	float _max_rate_neg;
+	float _roll_ff;
+};
+
+#endif // ECL_PITCH_CONTROLLER_H

@@ -52,7 +52,7 @@
 #include <stdint.h>
 #include <systemlib/perf_counter.h>
 
-struct ECL_ControlData {
+struct ECL_AnfisControlData {
 	float roll;
 	float pitch;
 	float yaw;
@@ -78,15 +78,15 @@ struct ECL_ControlData {
 	bool lock_integrator;
 };
 
-class __EXPORT ECL_Controller
+class __EXPORT ECL_AnfisController
 {
 public:
-	ECL_Controller(const char *name);
+    ECL_AnfisController(const char *name);
 
-	~ECL_Controller();
+    ~ECL_AnfisController();
 
-	virtual float control_attitude(const struct ECL_ControlData &ctl_data) = 0;
-	virtual float control_bodyrate(const struct ECL_ControlData &ctl_data) = 0;
+    virtual float control_attitude(const struct ECL_AnfisControlData &ctl_data) = 0;
+    virtual float control_bodyrate(const struct ECL_AnfisControlData &ctl_data) = 0;
 
 	/* Setters */
 	void set_time_constant(float time_constant);

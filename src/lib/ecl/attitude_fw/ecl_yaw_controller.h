@@ -53,17 +53,17 @@
 
 #include "ecl_controller.h"
 
-class __EXPORT ECL_YawController :
-	public ECL_Controller
+class __EXPORT ECL_AnfisYawController :
+	public ECL_AnfisController
 {
 public:
-	ECL_YawController();
+	ECL_AnfisYawController();
 
-	~ECL_YawController();
+	~ECL_AnfisYawController();
 
-	float control_attitude(const struct ECL_ControlData &ctl_data);
+	float control_attitude(const struct ECL_AnfisControlData &ctl_data);
 
-	float control_bodyrate(const struct ECL_ControlData &ctl_data);
+	float control_bodyrate(const struct ECL_AnfisControlData &ctl_data);
 
 	/* Additional setters */
 	void set_coordinated_min_speed(float coordinated_min_speed)
@@ -86,11 +86,11 @@ protected:
 
 	int32_t _coordinated_method;
 
-	float control_bodyrate_impl(const struct ECL_ControlData &ctl_data);
+	float control_bodyrate_impl(const struct ECL_AnfisControlData &ctl_data);
 
-	float control_attitude_impl_openloop(const struct ECL_ControlData &ctl_data);
+	float control_attitude_impl_openloop(const struct ECL_AnfisControlData &ctl_data);
 
-	float control_attitude_impl_accclosedloop(const struct ECL_ControlData &ctl_data);
+	float control_attitude_impl_accclosedloop(const struct ECL_AnfisControlData &ctl_data);
 
 };
 

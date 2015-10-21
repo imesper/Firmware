@@ -32,8 +32,8 @@
  ****************************************************************************/
 
 /**
- * @file ecl_controller.cpp
- * Definition of base class for other controllers
+ * @file ecl_yaw_controller.h
+ * Definition of a simple orthogonal coordinated turn yaw PID controller.
  *
  * @author Lorenz Meier <lm@inf.ethz.ch>
  * @author Thomas Gubler <thomasgubler@gmail.com>
@@ -45,96 +45,53 @@
  *   which in turn is based on initial work of
  *   Jonathan Challinger, 2012.
  */
+#ifndef ECL_YAW_CONTROLLER_H
+#define ECL_YAW_CONTROLLER_H
 
-#include "ecl_controller.h"
+#include <stdbool.h>
+#include <stdint.h>
 
-#include <stdio.h>
-#include <mathlib/mathlib.h>
+#include "ecl_anfis_controller.h"
 
-ECL_AnfisController::ECL_AnfisController(const char *name) :
-	_last_run(0),
-	_tc(0.1f),
-	_k_p(0.0f),
-	_k_i(0.0f),
-	_k_ff(0.0f),
-	_integrator_max(0.0f),
-	_max_rate(0.0f),
-	_last_output(0.0f),
-	_integrator(0.0f),
-	_rate_error(0.0f),
-	_rate_setpoint(0.0f),
-	_bodyrate_setpoint(0.0f),
-	_perf_name()
+class __EXPORT ECL_AnfisYawController :
+    public ECL_AnfisController
 {
-	/* Init performance counter */
-	snprintf(_perf_name, sizeof(_perf_name), "fw att control %s nonfinite input", name);
-	_nonfinite_input_perf = perf_alloc(PC_COUNT, _perf_name);
-}
+public:
+    ECL_AnfisYawController();
 
-ECL_AnfisController::~ECL_AnfisController()
-{
-	perf_free(_nonfinite_input_perf);
-}
+    ~ECL_AnfisYawController();
 
-void ECL_AnfisController::reset_integrator()
-{
-	_integrator = 0.0f;
-}
+    float control_attitude(const struct ECL_AnfisControlData &ctl_data);
 
-void ECL_AnfisController::set_time_constant(float time_constant)
-{
-	if (time_constant > 0.1f && time_constant < 3.0f) {
-		_tc = time_constant;
+    float control_bodyrate(const struct ECL_AnfisControlData &ctl_data);
+
+	/* Additional setters */
+	void set_coordinated_min_speed(float coordinated_min_speed)
+	{
+		_coordinated_min_speed = coordinated_min_speed;
 	}
-}
 
-void ECL_AnfisController::set_k_p(float k_p)
-{
-	_k_p = k_p;
-}
-
-void ECL_AnfisController::set_k_i(float k_i)
-{
-	_k_i = k_i;
-}
-
-void ECL_AnfisController::set_k_ff(float k_ff)
-{
-	_k_ff = k_ff;
-}
-
-void ECL_AnfisController::set_integrator_max(float max)
-{
-	_integrator_max = max;
-}
-
-void ECL_AnfisController::set_max_rate(float max_rate)
-{
-	_max_rate = max_rate;
-}
-
-float ECL_AnfisController::get_rate_error()
-{
-	return _rate_error;
-}
-
-float ECL_AnfisController::get_desired_rate()
-{
-	return _rate_setpoint;
-}
-
-float ECL_AnfisController::get_desired_bodyrate()
-{
-	return _bodyrate_setpoint;
-}
-
-float ECL_AnfisController::constrain_airspeed(float airspeed, float minspeed, float maxspeed) {
-	float airspeed_result = airspeed;
-	if (!PX4_ISFINITE(airspeed)) {
-		/* airspeed is NaN, +- INF or not available, pick center of band */
-		airspeed_result = 0.5f * (minspeed + maxspeed);
-	} else if (airspeed < minspeed) {
-		airspeed_result = minspeed;
+	void set_coordinated_method(int32_t coordinated_method)
+	{
+		_coordinated_method = coordinated_method;
 	}
-	return airspeed_result;
-}
+
+protected:
+	float _coordinated_min_speed;
+
+	enum {
+		COORD_METHOD_OPEN = 0,
+		COORD_METHOD_CLOSEACC = 1,
+	};
+
+	int32_t _coordinated_method;
+
+    float control_bodyrate_impl(const struct ECL_AnfisControlData &ctl_data);
+
+    float control_attitude_impl_openloop(const struct ECL_AnfisControlData &ctl_data);
+
+    float control_attitude_impl_accclosedloop(const struct ECL_AnfisControlData &ctl_data);
+
+};
+
+#endif // ECL_YAW_CONTROLLER_H

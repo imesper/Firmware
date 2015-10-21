@@ -38,7 +38,7 @@
  * Authors and acknowledgements in header.
  */
 
-#include "ecl_yaw_controller.h"
+#include "ecl_anfis_yaw_controller.h"
 #include <stdint.h>
 #include <float.h>
 #include <geo/geo.h>
@@ -48,7 +48,7 @@
 #include <ecl/ecl.h>
 
 ECL_AnfisYawController::ECL_AnfisYawController() :
-    ECL_AnfisController("yaw"),
+	ECL_Controller("yaw"),
 	_coordinated_min_speed(1.0f),
 	_coordinated_method(0)
 {
@@ -58,7 +58,7 @@ ECL_AnfisYawController::~ECL_AnfisYawController()
 {
 }
 
-float ECL_AnfisYawController::control_attitude(const struct ECL_AnfisControlData &ctl_data)
+float ECL_AnfisYawController::control_attitude(const ECL_AnfisControlData &ctl_data)
 {
 	switch (_coordinated_method) {
 	case COORD_METHOD_OPEN:
@@ -79,7 +79,7 @@ float ECL_AnfisYawController::control_attitude(const struct ECL_AnfisControlData
 	return _rate_setpoint;
 }
 
-float ECL_AnfisYawController::control_bodyrate(const struct ECL_AnfisControlData &ctl_data)
+float ECL_AnfisYawController::control_bodyrate(const ECL_AnfisControlData &ctl_data)
 {
 	switch (_coordinated_method) {
 	case COORD_METHOD_OPEN:
@@ -98,7 +98,7 @@ float ECL_AnfisYawController::control_bodyrate(const struct ECL_AnfisControlData
 	return math::constrain(_last_output, -1.0f, 1.0f);
 }
 
-float ECL_AnfisYawController::control_attitude_impl_openloop(const struct ECL_AnfisControlData &ctl_data)
+float ECL_AnfisYawController::control_attitude_impl_openloop(const ECL_AnfisControlData &ctl_data)
 {
 	/* Do not calculate control signal with bad inputs */
 	if (!(PX4_ISFINITE(ctl_data.roll) &&
@@ -233,7 +233,7 @@ float ECL_AnfisYawController::control_bodyrate_impl(const struct ECL_AnfisContro
 	return math::constrain(_last_output, -1.0f, 1.0f);
 }
 
-float ECL_AnfisYawController::control_attitude_impl_accclosedloop(const struct ECL_AnfisControlData &ctl_data)
+float ECL_AnfisYawController::control_attitude_impl_accclosedloop(const ECL_AnfisControlData &ctl_data)
 {
 	/* dont set a rate setpoint */
 	return 0.0f;

@@ -32,17 +32,13 @@
 ############################################################################
 px4_add_module(
         MODULE modules__anfis_att_control
-        MAIN anfis_att_control
+        MAIN fw_anfis_att_control
 	STACK 1200
 	COMPILE_FLAGS
-                -Wframe-larger-than=1300
+                -Os
 	SRCS
-                anfis_att_control.c
-                anfis.c
-                datastru.c
-                forward.c
-                params.c
-                standard.c
+                fw_anfis_att_control.cpp
+                
 	DEPENDS
 		platforms__common
 	)

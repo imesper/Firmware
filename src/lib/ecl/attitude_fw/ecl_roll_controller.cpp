@@ -47,16 +47,16 @@
 #include <mathlib/mathlib.h>
 #include <systemlib/err.h>
 
-ECL_RollController::ECL_RollController() :
-	ECL_Controller("roll")
+ECL_AnfisRollController::ECL_AnfisRollController() :
+    ECL_AnfisController("roll")
 {
 }
 
-ECL_RollController::~ECL_RollController()
+ECL_AnfisRollController::~ECL_AnfisRollController()
 {
 }
 
-float ECL_RollController::control_attitude(const struct ECL_ControlData &ctl_data)
+float ECL_AnfisRollController::control_attitude(const struct ECL_AnfisControlData &ctl_data)
 {
 	/* Do not calculate control signal with bad inputs */
 	if (!(PX4_ISFINITE(ctl_data.roll_setpoint) && PX4_ISFINITE(ctl_data.roll))) {
@@ -80,7 +80,7 @@ float ECL_RollController::control_attitude(const struct ECL_ControlData &ctl_dat
 	return _rate_setpoint;
 }
 
-float ECL_RollController::control_bodyrate(const struct ECL_ControlData &ctl_data)
+float ECL_AnfisRollController::control_bodyrate(const struct ECL_AnfisControlData &ctl_data)
 {
 	/* Do not calculate control signal with bad inputs */
 	if (!(PX4_ISFINITE(ctl_data.pitch) &&

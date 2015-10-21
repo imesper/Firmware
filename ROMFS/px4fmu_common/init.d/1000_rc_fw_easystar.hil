@@ -40,4 +40,4 @@ then
 fi
 
 set HIL yes
-set MIXER AERT
+set MIXER delta

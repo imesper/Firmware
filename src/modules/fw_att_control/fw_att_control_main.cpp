@@ -92,18 +92,18 @@
  */
 extern "C" __EXPORT int fw_att_control_main(int argc, char *argv[]);
 
-class FixedwingAttitudeControl
+class FixedwingAnfisAttitudeControl
 {
 public:
 	/**
 	 * Constructor
 	 */
-	FixedwingAttitudeControl();
+    FixedwingAnfisAttitudeControl();
 
 	/**
 	 * Destructor, also kills the main task.
 	 */
-	~FixedwingAttitudeControl();
+    ~FixedwingAnfisAttitudeControl();
 
 	/**
 	 * Start the main task.
@@ -243,9 +243,9 @@ private:
 	}		_parameter_handles;		/**< handles for interesting parameters */
 
 
-	ECL_RollController				_roll_ctrl;
-	ECL_PitchController				_pitch_ctrl;
-	ECL_YawController				_yaw_ctrl;
+    ECL_AnfisRollController				_roll_ctrl;
+    ECL_AnfisPitchController				_pitch_ctrl;
+    ECL_AnfisYawController				_yaw_ctrl;
 
 
 	/**
@@ -307,7 +307,7 @@ private:
 
 };
 
-namespace att_control
+namespace att_anfis_control
 {
 
 /* oddly, ERROR is not defined for c++ */
@@ -316,10 +316,10 @@ namespace att_control
 #endif
 static const int ERROR = -1;
 
-FixedwingAttitudeControl	*g_control = nullptr;
+FixedwingAnfisAttitudeControl	*g_control = nullptr;
 }
 
-FixedwingAttitudeControl::FixedwingAttitudeControl() :
+FixedwingAnfisAttitudeControl::FixedwingAnfisAttitudeControl() :
 
 	_task_should_exit(false),
 	_task_running(false),
@@ -408,7 +408,7 @@ FixedwingAttitudeControl::FixedwingAttitudeControl() :
 	parameters_update();
 }
 
-FixedwingAttitudeControl::~FixedwingAttitudeControl()
+FixedwingAnfisAttitudeControl::~FixedwingAnfisAttitudeControl()
 {
 	if (_control_task != -1) {
 
@@ -434,11 +434,11 @@ FixedwingAttitudeControl::~FixedwingAttitudeControl()
 	perf_free(_nonfinite_input_perf);
 	perf_free(_nonfinite_output_perf);
 
-	att_control::g_control = nullptr;
+    att_anfis_control::g_control = nullptr;
 }
 
 int
-FixedwingAttitudeControl::parameters_update()
+FixedwingAnfisAttitudeControl::parameters_update()
 {
 
 	param_get(_parameter_handles.tconst, &(_parameters.tconst));
@@ -512,7 +512,7 @@ FixedwingAttitudeControl::parameters_update()
 }
 
 void
-FixedwingAttitudeControl::vehicle_control_mode_poll()
+FixedwingAnfisAttitudeControl::vehicle_control_mode_poll()
 {
 	bool vcontrol_mode_updated;
 
@@ -526,7 +526,7 @@ FixedwingAttitudeControl::vehicle_control_mode_poll()
 }
 
 void
-FixedwingAttitudeControl::vehicle_manual_poll()
+FixedwingAnfisAttitudeControl::vehicle_manual_poll()
 {
 	bool manual_updated;
 
@@ -540,7 +540,7 @@ FixedwingAttitudeControl::vehicle_manual_poll()
 }
 
 void
-FixedwingAttitudeControl::vehicle_airspeed_poll()
+FixedwingAnfisAttitudeControl::vehicle_airspeed_poll()
 {
 	/* check if there is a new position */
 	bool airspeed_updated;
@@ -552,7 +552,7 @@ FixedwingAttitudeControl::vehicle_airspeed_poll()
 }
 
 void
-FixedwingAttitudeControl::vehicle_accel_poll()
+FixedwingAnfisAttitudeControl::vehicle_accel_poll()
 {
 	/* check if there is a new position */
 	bool accel_updated;
@@ -564,7 +564,7 @@ FixedwingAttitudeControl::vehicle_accel_poll()
 }
 
 void
-FixedwingAttitudeControl::vehicle_setpoint_poll()
+FixedwingAnfisAttitudeControl::vehicle_setpoint_poll()
 {
 	/* check if there is a new setpoint */
 	bool att_sp_updated;
@@ -577,7 +577,7 @@ FixedwingAttitudeControl::vehicle_setpoint_poll()
 }
 
 void
-FixedwingAttitudeControl::global_pos_poll()
+FixedwingAnfisAttitudeControl::global_pos_poll()
 {
 	/* check if there is a new global position */
 	bool global_pos_updated;
@@ -589,7 +589,7 @@ FixedwingAttitudeControl::global_pos_poll()
 }
 
 void
-FixedwingAttitudeControl::vehicle_status_poll()
+FixedwingAnfisAttitudeControl::vehicle_status_poll()
 {
 	/* check if there is new status information */
 	bool vehicle_status_updated;
@@ -611,13 +611,13 @@ FixedwingAttitudeControl::vehicle_status_poll()
 }
 
 void
-FixedwingAttitudeControl::task_main_trampoline(int argc, char *argv[])
+FixedwingAnfisAttitudeControl::task_main_trampoline(int argc, char *argv[])
 {
-	att_control::g_control->task_main();
+    att_anfis_control::g_control->task_main();
 }
 
 void
-FixedwingAttitudeControl::task_main()
+FixedwingAnfisAttitudeControl::task_main()
 {
 	/*
 	 * do subscriptions
@@ -971,7 +971,7 @@ FixedwingAttitudeControl::task_main()
 				}
 
 				/* Prepare data for attitude controllers */
-				struct ECL_ControlData control_input = {};
+                struct ECL_AnfisControlData control_input = {};
 				control_input.roll = _att.roll;
 				control_input.pitch = _att.pitch;
 				control_input.yaw = _att.yaw;
@@ -1138,7 +1138,7 @@ FixedwingAttitudeControl::task_main()
 }
 
 int
-FixedwingAttitudeControl::start()
+FixedwingAnfisAttitudeControl::start()
 {
 	ASSERT(_control_task == -1);
 
@@ -1147,7 +1147,7 @@ FixedwingAttitudeControl::start()
 				       SCHED_DEFAULT,
 				       SCHED_PRIORITY_MAX - 5,
 				       1300,
-				       (px4_main_t)&FixedwingAttitudeControl::task_main_trampoline,
+                       (px4_main_t)&FixedwingAnfisAttitudeControl::task_main_trampoline,
 				       nullptr);
 
 	if (_control_task < 0) {
@@ -1167,30 +1167,30 @@ int fw_att_control_main(int argc, char *argv[])
 
 	if (!strcmp(argv[1], "start")) {
 
-		if (att_control::g_control != nullptr) {
+        if (att_anfis_control::g_control != nullptr) {
 			warnx("already running");
 			return 1;
 		}
 
-		att_control::g_control = new FixedwingAttitudeControl;
+        att_anfis_control::g_control = new FixedwingAnfisAttitudeControl;
 
-		if (att_control::g_control == nullptr) {
+        if (att_anfis_control::g_control == nullptr) {
 			warnx("alloc failed");
 			return 1;
 		}
 
-		if (OK != att_control::g_control->start()) {
-			delete att_control::g_control;
-			att_control::g_control = nullptr;
+        if (OK != att_anfis_control::g_control->start()) {
+            delete att_anfis_control::g_control;
+            att_anfis_control::g_control = nullptr;
 			warn("start failed");
 			return 1;
 		}
 
 		/* check if the waiting is necessary at all */
-		if (att_control::g_control == nullptr || !att_control::g_control->task_running()) {
+        if (att_anfis_control::g_control == nullptr || !att_anfis_control::g_control->task_running()) {
 
 			/* avoid memory fragmentation by not exiting start handler until the task has fully started */
-			while (att_control::g_control == nullptr || !att_control::g_control->task_running()) {
+            while (att_anfis_control::g_control == nullptr || !att_anfis_control::g_control->task_running()) {
 				usleep(50000);
 				printf(".");
 				fflush(stdout);
@@ -1201,18 +1201,18 @@ int fw_att_control_main(int argc, char *argv[])
 	}
 
 	if (!strcmp(argv[1], "stop")) {
-		if (att_control::g_control == nullptr){
+        if (att_anfis_control::g_control == nullptr){
 			warnx("not running");
 			return 1;
 		}
 
-		delete att_control::g_control;
-		att_control::g_control = nullptr;
+        delete att_anfis_control::g_control;
+        att_anfis_control::g_control = nullptr;
 		return 0;
 	}
 
 	if (!strcmp(argv[1], "status")) {
-		if (att_control::g_control) {
+        if (att_anfis_control::g_control) {
 			warnx("running");
 			return 0;
 
