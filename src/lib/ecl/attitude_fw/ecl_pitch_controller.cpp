@@ -41,6 +41,8 @@
 #include "ecl_pitch_controller.h"
 #include <math.h>
 #include <stdint.h>
+#include <fcntl.h>
+#include <unistd.h>
 #include <float.h>
 #include <geo/geo.h>
 #include <ecl/ecl.h>
@@ -52,10 +54,12 @@ ECL_PitchController::ECL_PitchController() :
 	_max_rate_neg(0.0f),
 	_roll_ff(0.0f)
 {
+
 }
 
 ECL_PitchController::~ECL_PitchController()
 {
+    //close(fp);
 }
 
 float ECL_PitchController::control_attitude(const struct ECL_ControlData &ctl_data)
@@ -89,6 +93,10 @@ float ECL_PitchController::control_attitude(const struct ECL_ControlData &ctl_da
 	}
 
 	return _rate_setpoint;
+}
+
+void ECL_PitchController::closeFile(){
+    //close(fp);
 }
 
 float ECL_PitchController::control_bodyrate(const ECL_ControlData &ctl_data)
@@ -197,5 +205,9 @@ float ECL_PitchController::control_bodyrate(const ECL_ControlData &ctl_data)
 		       + integrator_constrained;  //scaler is proportional to 1/airspeed
 //	warnx("pitch: _integrator: %.4f, _integrator_max: %.4f, airspeed %.4f, _k_i %.4f, _k_p: %.4f", (double)_integrator, (double)_integrator_max, (double)airspeed, (double)_k_i, (double)_k_p);
 //	warnx("roll: _last_output %.4f", (double)_last_output);
+    fp = open(PX4_ROOTFSDIR"/fs/microsd/log/output_pitch.csv", O_CREAT | O_WRONLY | O_DSYNC | O_APPEND);
+    int bytes = sprintf(buffer, "%.6f,%.6f,%.6f\n", (double)_rate_error, (double)_dif_rate_error, (double)math::constrain(_last_output, -1.0f, 1.0f));
+    write(fp, buffer, bytes);
+    close(fp);
 	return math::constrain(_last_output, -1.0f, 1.0f);
 }

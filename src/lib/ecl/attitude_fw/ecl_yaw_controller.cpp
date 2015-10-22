@@ -41,6 +41,8 @@
 #include "ecl_yaw_controller.h"
 #include <stdint.h>
 #include <float.h>
+#include <fcntl.h>
+#include <unistd.h>
 #include <geo/geo.h>
 #include <ecl/ecl.h>
 #include <mathlib/mathlib.h>
@@ -52,10 +54,16 @@ ECL_YawController::ECL_YawController() :
 	_coordinated_min_speed(1.0f),
 	_coordinated_method(0)
 {
+
 }
 
 ECL_YawController::~ECL_YawController()
 {
+    //close(fp);
+}
+
+void ECL_YawController::closeFile(){
+    //close(fp);
 }
 
 float ECL_YawController::control_attitude(const struct ECL_ControlData &ctl_data)
@@ -203,6 +211,8 @@ float ECL_YawController::control_bodyrate_impl(const struct ECL_ControlData &ctl
     _dif_rate_error = _rate_error - _last_rate_error;
     _last_rate_error = _rate_error;
 
+
+
 	if (!lock_integrator && _k_i > 0.0f && airspeed > 0.5f * ctl_data.airspeed_min) {
 
 		float id = _rate_error * dt;
@@ -230,8 +240,10 @@ float ECL_YawController::control_bodyrate_impl(const struct ECL_ControlData &ctl
 	_last_output = (_bodyrate_setpoint * _k_ff + _rate_error * _k_p + integrator_constrained) * ctl_data.scaler *
 		       ctl_data.scaler;  //scaler is proportional to 1/airspeed
 	//warnx("yaw:_last_output: %.4f, _integrator: %.4f, _integrator_max: %.4f, airspeed %.4f, _k_i %.4f, _k_p: %.4f", (double)_last_output, (double)_integrator, (double)_integrator_max, (double)airspeed, (double)_k_i, (double)_k_p);
-
-
+    fp = open(PX4_ROOTFSDIR"/fs/microsd/log/output_yaw.csv", O_CREAT | O_WRONLY | O_DSYNC | O_APPEND);
+    int bytes = sprintf(buffer, "%.6f,%.6f,%.6f\n", (double)_rate_error, (double)_dif_rate_error, (double)math::constrain(_last_output, -1.0f, 1.0f));
+    write(fp, buffer, bytes);
+    close(fp);
 	return math::constrain(_last_output, -1.0f, 1.0f);
 }
 

@@ -61,9 +61,11 @@ public:
     ECL_RollController();
 
     ~ECL_RollController();
-
+    void closeFile(void);
     float control_attitude(const struct ECL_ControlData &ctl_data);
     float control_bodyrate(const struct ECL_ControlData &ctl_data);
+protected:
+    int fp;
 };
 
 #endif // ECL_ROLL_CONTROLLER_H

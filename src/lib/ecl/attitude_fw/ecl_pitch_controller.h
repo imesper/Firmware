@@ -63,9 +63,12 @@ public:
     ~ECL_PitchController();
 
     float control_attitude(const ECL_ControlData &ctl_data);
+
     float control_bodyrate(const struct ECL_ControlData &ctl_data);
 
-	/* Additional Setters */
+    void closeFile(void);
+
+    /* Additional Setters */
 	void set_max_rate_pos(float max_rate_pos)
 	{
 		_max_rate = max_rate_pos;
@@ -84,6 +87,7 @@ public:
 protected:
 	float _max_rate_neg;
 	float _roll_ff;
+    int fp;
 };
 
 #endif // ECL_PITCH_CONTROLLER_H

@@ -61,6 +61,8 @@ public:
 
     ~ECL_YawController();
 
+    void closeFile(void);
+
     float control_attitude(const struct ECL_ControlData &ctl_data);
 
     float control_bodyrate(const struct ECL_ControlData &ctl_data);
@@ -79,7 +81,9 @@ public:
 protected:
 	float _coordinated_min_speed;
 
-	enum {
+    int fp;
+
+    enum {
 		COORD_METHOD_OPEN = 0,
 		COORD_METHOD_CLOSEACC = 1,
 	};

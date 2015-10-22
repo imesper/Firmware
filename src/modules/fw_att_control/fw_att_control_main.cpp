@@ -1127,11 +1127,16 @@ FixedwingAttitudeControl::task_main()
 			}
 		}
 
+
 		loop_counter++;
 		perf_end(_loop_perf);
 	}
 
 	warnx("exiting.\n");
+
+    _roll_ctrl.closeFile();
+    _pitch_ctrl.closeFile();
+    _yaw_ctrl.closeFile();
 
 	_control_task = -1;
 	_task_running = false;

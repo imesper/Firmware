@@ -41,6 +41,8 @@
 #include <ecl/ecl.h>
 #include "ecl_roll_controller.h"
 #include <stdint.h>
+#include <fcntl.h>
+#include <unistd.h>
 #include <float.h>
 #include <geo/geo.h>
 #include <ecl/ecl.h>
@@ -50,10 +52,16 @@
 ECL_RollController::ECL_RollController() :
     ECL_Controller("roll")
 {
+
 }
 
 ECL_RollController::~ECL_RollController()
 {
+    //close(fp);
+}
+
+void ECL_RollController::closeFile(){
+    //close(fp);
 }
 
 float ECL_RollController::control_attitude(const ECL_ControlData &ctl_data)
@@ -142,7 +150,10 @@ float ECL_RollController::control_bodyrate(const struct ECL_ControlData &ctl_dat
 	_last_output = _bodyrate_setpoint * _k_ff * ctl_data.scaler +
 		       _rate_error * _k_p * ctl_data.scaler * ctl_data.scaler
 		       + integrator_constrained;  //scaler is proportional to 1/airspeed
-
+    fp = open(PX4_ROOTFSDIR"/fs/microsd/log/output_roll.csv", O_CREAT | O_WRONLY | O_DSYNC | O_APPEND);
+    int bytes = sprintf(buffer, "%.6f,%.6f,%.6f\n", (double)_rate_error, (double)_dif_rate_error, (double)math::constrain(_last_output, -1.0f, 1.0f));
+    write(fp, buffer, bytes);
+    close(fp);
 	return math::constrain(_last_output, -1.0f, 1.0f);
 }
 
