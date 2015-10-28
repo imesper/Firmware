@@ -52,14 +52,14 @@ ECL_AnfisYawController::ECL_AnfisYawController() :
 	_coordinated_min_speed(1.0f),
 	_coordinated_method(0)
 {
-    //anfis = (ANFIS_T *) malloc (sizeof(ANFIS_T));
+    anfis = (ANFIS_T *) malloc (sizeof(ANFIS_T));
 
-    //start_anfis(2,5, PX4_ROOTFSDIR"/etc/params/paramYaw.fin", anfis);
+    start_anfis(2,5, PX4_ROOTFSDIR"/etc/params/paramYaw.fin", anfis);
 }
 
 ECL_AnfisYawController::~ECL_AnfisYawController()
 {
-    //free(anfis);
+    free(anfis);
 }
 
 float ECL_AnfisYawController::control_attitude(const ECL_AnfisControlData &ctl_data)

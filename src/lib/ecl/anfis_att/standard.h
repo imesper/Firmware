@@ -11,7 +11,9 @@
 #include <string.h>
 #include <stdlib.h>
 #include <math.h>
-
+#ifdef __cplusplus /* If this is a C++ compiler, use C linkage */
+extern "C" {
+#endif	
 /* handy macros */
 #define ABS(x)   ( x > 0 ? (x): (-(x)) )
 #define MAX(x,y) ( x > y ? (x) : (y) )
@@ -58,3 +60,6 @@ double m_norm(double **m, int row, int col);
 void exit1(char *s);
 char *basename(char *path);
 char * get_pwd(void);
+#ifdef __cplusplus /* If this is a C++ compiler, end C linkage */
+}
+#endif

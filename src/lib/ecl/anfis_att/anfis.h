@@ -6,6 +6,10 @@
    as long as this notice is preserved.  All standard disclaimers apply.
 */
 
+#ifdef __cplusplus /* If this is a C++ compiler, use C linkage */
+extern "C" {
+#endif
+
 #include "standard.h"
 
 /* data structure */
@@ -71,3 +75,6 @@ double sum(int node_index, ANFIS_T *anfis);
 void get_parameter(const char *parameter_file, ANFIS_T *anfis);
 double run(double *data_vector, ANFIS_T *anfis);
 void start_anfis(int in_n, int mf_n, const char *parameter_file, ANFIS_T *anfis);
+#ifdef __cplusplus /* If this is a C++ compiler, end C linkage */
+}
+#endif

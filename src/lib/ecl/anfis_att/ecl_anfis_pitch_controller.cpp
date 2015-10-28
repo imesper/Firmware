@@ -52,15 +52,15 @@ ECL_AnfisPitchController::ECL_AnfisPitchController() :
 	_max_rate_neg(0.0f),
     _roll_ff(0.0f)
 {
-    //anfis = (ANFIS_T *) malloc (sizeof(ANFIS_T));
+    anfis = (ANFIS_T *) malloc (sizeof(ANFIS_T));
 
-    //start_anfis(2,5, PX4_ROOTFSDIR"/etc/params/paramPitch.fin", anfis);
+    start_anfis(2,5, PX4_ROOTFSDIR"/etc/params/paramPitch.fin", anfis);
 
 }
 
 ECL_AnfisPitchController::~ECL_AnfisPitchController()
 {
-    //free(anfis);
+    free(anfis);
 }
 
 float ECL_AnfisPitchController::control_attitude(const ECL_AnfisControlData &ctl_data)
