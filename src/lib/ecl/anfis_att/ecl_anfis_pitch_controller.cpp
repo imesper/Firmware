@@ -52,10 +52,15 @@ ECL_AnfisPitchController::ECL_AnfisPitchController() :
 	_max_rate_neg(0.0f),
     _roll_ff(0.0f)
 {
+    anfis = (ANFIS_T *) malloc (sizeof(ANFIS_T));
+
+    start_anfis(2,5, PX4_ROOTFSDIR"/etc/params/paramPitch.fin", anfis);
+
 }
 
 ECL_AnfisPitchController::~ECL_AnfisPitchController()
 {
+    free(anfis);
 }
 
 float ECL_AnfisPitchController::control_attitude(const ECL_AnfisControlData &ctl_data)
@@ -103,6 +108,7 @@ float ECL_AnfisPitchController::control_bodyrate(const ECL_AnfisControlData &ctl
 	      PX4_ISFINITE(ctl_data.airspeed_max) &&
 	      PX4_ISFINITE(ctl_data.scaler))) {
 		perf_count(_nonfinite_input_perf);
+
 		return math::constrain(_last_output, -1.0f, 1.0f);
 	}
 

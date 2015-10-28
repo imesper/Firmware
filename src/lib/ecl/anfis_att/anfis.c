@@ -9,11 +9,8 @@
 #include "anfis.h"
 #include <fcntl.h>
 
-NODE_T **node_p;
 
-int Rule_n, Node_n, In_n, Mf_n;
-
-void get_parameter(char * parameter_file)
+void get_parameter(char * parameter_file, ANFIS_T *anfis)
 {
     int i, j;
     int parameter_n;
@@ -21,15 +18,18 @@ void get_parameter(char * parameter_file)
     int res;
     double tmp;
     int fp;
+
+
     PARAMETER_LIST_T *p;
 
     fp = open(parameter_file,  O_RDONLY);
-    for (i = 0; i < Node_n; i++) {
-        if (node_p[i]->parameter == NULL)
+
+    for (i = 0; i < anfis->Node_n; i++) {
+        if (anfis->node_p[i]->parameter == NULL)
             continue;
 
         parameter_n = node_p[i]->parameter_n;
-        p = node_p[i]->parameter;
+        p = anfis->node_p[i]->parameter;
         //printf("Parameter: %d \n", parameter_n);
         for (int k = 0; k < parameter_n; k++){
 
@@ -52,30 +52,31 @@ void get_parameter(char * parameter_file)
     close(fp);
 }
 
-void start_anfis(int in_n, int mf_n, char *parameter_file){
+void start_anfis(int in_n, int mf_n, char *parameter_file, ANFIS_T *anfis){
 
-    In_n = in_n;
-    Mf_n = mf_n;
+
+
+    anfis->In_n = in_n;
+    anfis->Mf_n = mf_n;
 
     Rule_n = pow((double)Mf_n, (double)In_n);
     Node_n = In_n + In_n*Mf_n + 3*Rule_n + 1;
-
     /* allocate matrices */
-    node_p = (NODE_T **)create_array(Node_n, sizeof(NODE_T *));
+    anfis->node_p = (NODE_T **)create_array(Node_n, sizeof(NODE_T *));
 
     //anfis_output = (double *)calloc(training_data_n, sizeof(double));
-    gen_config(In_n, Mf_n);
+    gen_config(anfis);
 
-    build_anfis();
+    build_anfis(anfis);
 
     //parameter_n = set_parameter_mode();
 
     //parameter_array = (double *)calloc(parameter_n, sizeof(double));
 
-    get_parameter(parameter_file);
+    get_parameter(parameter_file, anfis);
 }
 
-double run(double *data_vector)
+double run(double *data_vector, ANFIS_T *anfis)
 {
     int k;
     //int parameter_n;
@@ -89,12 +90,12 @@ double run(double *data_vector)
     //if (debug != 0) debug_anfis();
 
     //put_input_data(j, training_data_matrix);
-    for (k = 0; k < In_n; k++)
-        node_p[k]->value = data_vector[k];
+    for (k = 0; k < anfis->In_n; k++)
+        anfis->node_p[k]->value = data_vector[k];
     /* get node outputs from layer 1 to layer 3 */
 
-    calculate_output(In_n, Node_n - 1);
+    calculate_output(anfis->In_n, anfis->Node_n - 1);
 
-    return node_p[Node_n - 1]->value;
+    return anfis->node_p[anfis->Node_n - 1]->value;
 }
 

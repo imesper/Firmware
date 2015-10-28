@@ -66,6 +66,7 @@ ECL_AnfisController::ECL_AnfisController(const char *name) :
 	/* Init performance counter */
     snprintf(_perf_name, sizeof(_perf_name), "fw anfis att control %s nonfinite input", name);
 	_nonfinite_input_perf = perf_alloc(PC_COUNT, _perf_name);
+
 }
 
 ECL_AnfisController::~ECL_AnfisController()

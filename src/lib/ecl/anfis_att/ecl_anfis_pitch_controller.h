@@ -84,6 +84,7 @@ public:
 protected:
 	float _max_rate_neg;
 	float _roll_ff;
+
 };
 
 #endif // ECL_PITCH_CONTROLLER_H

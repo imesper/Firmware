@@ -50,10 +50,14 @@
 ECL_AnfisRollController::ECL_AnfisRollController() :
     ECL_AnfisController("roll")
 {
+    anfis = (ANFIS_T *) malloc (sizeof(ANFIS_T));
+
+    start_anfis(2,5, PX4_ROOTFSDIR"/etc/params/paramRoll.fin", anfis);
 }
 
 ECL_AnfisRollController::~ECL_AnfisRollController()
 {
+    free(anfis);
 }
 
 float ECL_AnfisRollController::control_attitude(const ECL_AnfisControlData &ctl_data)
