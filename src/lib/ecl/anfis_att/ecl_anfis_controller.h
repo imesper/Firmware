@@ -52,7 +52,7 @@
 #include <stdint.h>
 #include <systemlib/perf_counter.h>
 
-#include "anfis.h"
+//#include "anfis.h"
 
 struct ECL_AnfisControlData {
 	float roll;
@@ -113,6 +113,6 @@ protected:
 	perf_counter_t _nonfinite_input_perf;
 	static const uint8_t _perf_name_max = 40;
 	char _perf_name[_perf_name_max];
-    ANFIS_T *anfis;
+    //ANFIS_T *anfis;
 	float constrain_airspeed(float airspeed, float minspeed, float maxspeed);
 };

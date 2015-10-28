@@ -14,6 +14,7 @@ extern int l3gd20_main(int argc, char *argv[]);
 extern int hmc5883_main(int argc, char *argv[]);
 extern int ms5611_main(int argc, char *argv[]);
 extern int mb12xx_main(int argc, char *argv[]);
+extern int srf02_main(int argc, char *argv[]);
 extern int sf0x_main(int argc, char *argv[]);
 extern int ll40ls_main(int argc, char *argv[]);
 extern int trone_main(int argc, char *argv[]);
@@ -82,6 +83,7 @@ const struct builtin_s g_builtins[] = {
 	{"hmc5883", SCHED_PRIORITY_DEFAULT, 1200, hmc5883_main},
 	{"ms5611", SCHED_PRIORITY_DEFAULT, 1024, ms5611_main},
 	{"mb12xx", SCHED_PRIORITY_DEFAULT, 1024, mb12xx_main},
+	{"srf02", SCHED_PRIORITY_DEFAULT, 1024, srf02_main},
 	{"sf0x", SCHED_PRIORITY_DEFAULT, 1024, sf0x_main},
 	{"ll40ls", SCHED_PRIORITY_DEFAULT, 1024, ll40ls_main},
 	{"trone", SCHED_PRIORITY_DEFAULT, 1200, trone_main},
@@ -139,4 +141,4 @@ const struct builtin_s g_builtins[] = {
 
 	{NULL, 0, 0, NULL}
 };
-const int g_builtin_count = 66;
+const int g_builtin_count = 67;
