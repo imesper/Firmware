@@ -9,32 +9,32 @@
 #include "anfis.h"
 
 /* calculate node outputs from node 'from' to node 'to' */
-void calculate_output(int from, int to)
+void calculate_output(int from, int to, ANFIS_T *anfis)
 
 {
 
-    static double (*function[6])(int) = {input, mf, multiply, normalize, consequent, sum};
+    static double (*function[6])(int, ANFIS_T *) = {input, mf, multiply, normalize, consequent, sum};
 	int i;
 	int function_index;
 
 	for (i = from; i <= to; i++) {
-		function_index= node_p[i]->function_index;
+        function_index= anfis->node_p[i]->function_index;
         printf("Function: %d \n", function_index);
-		node_p[i]->value = (*function[function_index])(i);
+        anfis->node_p[i]->value = (*function[function_index])(i, anfis);
 	}
 }
 
-double input(int node_index)
+double input(int node_index, ANFIS_T *anfis)
 {
 	printf("This shouldn't have been called!\n");
 	return(0);
 }
 
 /* membership function = 1/(1+pow((x - c)/a, 2*b)) */
-double mf(int node_index)
+double mf(int node_index, ANFIS_T *anfis)
 {
-	NODE_LIST_T *arg_p = node_p[node_index]->fan_in;
-	PARAMETER_LIST_T *para_p = node_p[node_index]->parameter;
+    NODE_LIST_T *arg_p = anfis->node_p[node_index]->fan_in;
+    PARAMETER_LIST_T *para_p = anfis->node_p[node_index]->parameter;
 	double c, a, b, x;
 	double tmp1, tmp2;
 
@@ -50,13 +50,13 @@ double mf(int node_index)
 	return(1/(1+ tmp2)); 
 }
 
-double multiply(int node_index)
+double multiply(int node_index, ANFIS_T *anfis)
 {
 	double product = 1.0;
 	NODE_LIST_T *p;
 
-	NODE_LIST_T *arg_p = node_p[node_index]->fan_in;
-	PARAMETER_LIST_T *para_p = node_p[node_index]->parameter;
+    NODE_LIST_T *arg_p = anfis->node_p[node_index]->fan_in;
+    PARAMETER_LIST_T *para_p = anfis->node_p[node_index]->parameter;
 	if (para_p != NULL)
 		exit1("Error in multiply!");
 	for (p = arg_p; p != NULL; p = p->next)
@@ -64,10 +64,10 @@ double multiply(int node_index)
 	return(product); 
 }
  
-double normalize(int node_index)
+double normalize(int node_index, ANFIS_T *anfis)
 {
-	NODE_LIST_T *arg_p = node_p[node_index]->fan_in;
-	PARAMETER_LIST_T *para_p = node_p[node_index]->parameter;
+    NODE_LIST_T *arg_p = anfis->node_p[node_index]->fan_in;
+    PARAMETER_LIST_T *para_p = anfis->node_p[node_index]->parameter;
 	int i;
 	double denom = 0;
 	NODE_LIST_T *p;
@@ -79,7 +79,7 @@ double normalize(int node_index)
 		denom += p->content->value;
 
 	p = arg_p;
-	for (i = 0; i < node_p[node_index]->local_index; i++) 
+    for (i = 0; i < anfis->node_p[node_index]->local_index; i++)
 		p = p->next; 
 
     if (denom > -0.00000001 && denom < 0.000000001)
@@ -88,16 +88,16 @@ double normalize(int node_index)
 	return(p->content->value/denom);
 }
 
-double consequent(int node_index)
+double consequent(int node_index, ANFIS_T *anfis)
 {
-	NODE_LIST_T *arg_p = node_p[node_index]->fan_in;
-	PARAMETER_LIST_T *para_p = node_p[node_index]->parameter;
+    NODE_LIST_T *arg_p = anfis->node_p[node_index]->fan_in;
+    PARAMETER_LIST_T *para_p = anfis->node_p[node_index]->parameter;
 	int i;
     double x = 0, a = 0, total = 0;
-	for (i = 0; i < In_n + 1; i++) {
+    for (i = 0; i < anfis->In_n + 1; i++) {
 		x = arg_p->content->value;
 		a = para_p->content;
-		if (i == In_n)
+        if (i == anfis->In_n)
 			break;
 		total += x*a;
 		arg_p = arg_p->next;
@@ -116,9 +116,9 @@ double consequent(int node_index)
 	*/
 }
 
-double sum(int node_index)
+double sum(int node_index, ANFIS_T *anfis)
 {
-	NODE_LIST_T *arg_p = node_p[node_index]->fan_in;
+    NODE_LIST_T *arg_p = anfis->node_p[node_index]->fan_in;
 	NODE_LIST_T *t;
 	double total = 0;
 

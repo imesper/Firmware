@@ -51,6 +51,7 @@
 #include <stdbool.h>
 #include <stdint.h>
 #include <systemlib/perf_counter.h>
+
 #include "anfis.h"
 
 struct ECL_AnfisControlData {

@@ -47,7 +47,7 @@ typedef struct anfis_s{
     int Node_n; /* number of total nodes */
     int Rule_n;    /* number of nodes in the 4-th layer */
     NODE_T **node_p;
-    static int **config;
+    int **config;
 }ANFIS_T;
 
 
@@ -56,18 +56,18 @@ void build_anfis(ANFIS_T *anfis);
 void build_layer(int layer, int n, int index, int parameter_n, int function_index, ANFIS_T *anfis);
 PARAMETER_LIST_T * build_parameter_list(int n);
 NODE_LIST_T * build_node_list(int type, int n, ANFIS_T *anfis);
-int set_parameter_mode(void);
-void calculate_output(int from, int to);
+int set_parameter_mode(ANFIS_T *anfis);
+void calculate_output(int from, int to, ANFIS_T *anfis);
 int connected(int i, int j, ANFIS_T *anfis);
 void digit_rep(int *rep, int j, ANFIS_T *anfis);
 int which_layer(int i, ANFIS_T *anfis);
 int between(int l, int x,  int u);
-double input(int node_index);
-double mf(int node_index);
-double multiply(int node_index);
-double normalize(int node_index);
-double consequent(int node_index);
-double sum(int node_index);
-void get_parameter(char * parameter_file, ANFIS_T *anfis);
+double input(int node_index, ANFIS_T *anfis);
+double mf(int node_index, ANFIS_T *anfis);
+double multiply(int node_index, ANFIS_T *anfis);
+double normalize(int node_index, ANFIS_T *anfis);
+double consequent(int node_index, ANFIS_T *anfis);
+double sum(int node_index, ANFIS_T *anfis);
+void get_parameter(const char *parameter_file, ANFIS_T *anfis);
 double run(double *data_vector, ANFIS_T *anfis);
-void start_anfis(int in_n, int mf_n, char *parameter_file, ANFIS_T *anfis);
+void start_anfis(int in_n, int mf_n, const char *parameter_file, ANFIS_T *anfis);

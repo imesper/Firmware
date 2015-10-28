@@ -10,7 +10,7 @@
 #include <fcntl.h>
 
 
-void get_parameter(char * parameter_file, ANFIS_T *anfis)
+void get_parameter(const char * parameter_file, ANFIS_T *anfis)
 {
     int i, j;
     int parameter_n;
@@ -28,7 +28,7 @@ void get_parameter(char * parameter_file, ANFIS_T *anfis)
         if (anfis->node_p[i]->parameter == NULL)
             continue;
 
-        parameter_n = node_p[i]->parameter_n;
+        parameter_n = anfis->node_p[i]->parameter_n;
         p = anfis->node_p[i]->parameter;
         //printf("Parameter: %d \n", parameter_n);
         for (int k = 0; k < parameter_n; k++){
@@ -52,17 +52,17 @@ void get_parameter(char * parameter_file, ANFIS_T *anfis)
     close(fp);
 }
 
-void start_anfis(int in_n, int mf_n, char *parameter_file, ANFIS_T *anfis){
+void start_anfis(int in_n, int mf_n, const char *parameter_file, ANFIS_T *anfis){
 
 
 
     anfis->In_n = in_n;
     anfis->Mf_n = mf_n;
 
-    Rule_n = pow((double)Mf_n, (double)In_n);
-    Node_n = In_n + In_n*Mf_n + 3*Rule_n + 1;
+    anfis->Rule_n = pow((double)anfis->Mf_n, (double)anfis->In_n);
+    anfis->Node_n = anfis->In_n + anfis->In_n*anfis->Mf_n + 3*anfis->Rule_n + 1;
     /* allocate matrices */
-    anfis->node_p = (NODE_T **)create_array(Node_n, sizeof(NODE_T *));
+    anfis->node_p = (NODE_T **)create_array(anfis->Node_n, sizeof(NODE_T *));
 
     //anfis_output = (double *)calloc(training_data_n, sizeof(double));
     gen_config(anfis);
@@ -94,7 +94,7 @@ double run(double *data_vector, ANFIS_T *anfis)
         anfis->node_p[k]->value = data_vector[k];
     /* get node outputs from layer 1 to layer 3 */
 
-    calculate_output(anfis->In_n, anfis->Node_n - 1);
+    calculate_output(anfis->In_n, anfis->Node_n - 1, anfis);
 
     return anfis->node_p[anfis->Node_n - 1]->value;
 }

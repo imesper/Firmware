@@ -41,8 +41,8 @@ connected(int i, int j, ANFIS_T *anfis)
 
     if (i >= j)
         return(0);
-    layer1 = which_layer(i);
-    layer2 = which_layer(j);
+    layer1 = which_layer(i, anfis);
+    layer2 = which_layer(j, anfis);
     if ((layer2 - layer1 != 1) && layer1 != 0)
         return(0);
     switch(layer1) {
@@ -61,7 +61,7 @@ connected(int i, int j, ANFIS_T *anfis)
             rep = (int *)calloc(anfis->In_n, sizeof(int));
             group = (i - anfis->In_n)/anfis->Mf_n;
             position = (i - anfis->In_n) % anfis->Mf_n;
-            digit_rep(rep, j - anfis->In_n - anfis->In_n*anfis->Mf_n);
+            digit_rep(rep, j - anfis->In_n - anfis->In_n*anfis->Mf_n, anfis);
             if (rep[group] == position)
                 return(1);
             break;
@@ -134,16 +134,16 @@ void build_anfis(ANFIS_T *anfis)
 
 	int i;
 
-    build_layer(0, anfis->In_n, 0, 0, 0);
-    build_layer(1, anfis->In_n*anfis->Mf_n, anfis->In_n, 3, 1);
-    build_layer(2, anfis->Rule_n, anfis->In_n+anfis->In_n*anfis->Mf_n, 0, 2);
-    build_layer(3, anfis->Rule_n, anfis->In_n+anfis->In_n*anfis->Mf_n+anfis->Rule_n, 0, 3);
-    build_layer(4, anfis->Rule_n, anfis->In_n+anfis->In_n*anfis->Mf_n+2*anfis->Rule_n, anfis->In_n + 1, 4);
-    build_layer(5, 1, anfis->In_n+anfis->In_n*anfis->Mf_n+3*anfis->Rule_n, 0, 5);
+    build_layer(0, anfis->In_n, 0, 0, 0, anfis);
+    build_layer(1, anfis->In_n*anfis->Mf_n, anfis->In_n, 3, 1, anfis);
+    build_layer(2, anfis->Rule_n, anfis->In_n+anfis->In_n*anfis->Mf_n, 0, 2, anfis);
+    build_layer(3, anfis->Rule_n, anfis->In_n+anfis->In_n*anfis->Mf_n+anfis->Rule_n, 0, 3, anfis);
+    build_layer(4, anfis->Rule_n, anfis->In_n+anfis->In_n*anfis->Mf_n+2*anfis->Rule_n, anfis->In_n + 1, 4, anfis);
+    build_layer(5, 1, anfis->In_n+anfis->In_n*anfis->Mf_n+3*anfis->Rule_n, 0, 5, anfis);
 
     for (i = 0; i < anfis->Node_n; i++) {
-		node_p[i]->fan_in  = build_node_list(0, i);
-		node_p[i]->fan_out = build_node_list(1, i);
+        anfis->node_p[i]->fan_in  = build_node_list(0, i, anfis);
+        anfis->node_p[i]->fan_out = build_node_list(1, i, anfis);
 	}
 }
 
@@ -205,7 +205,7 @@ NODE_LIST_T * build_node_list(int type, int n, ANFIS_T *anfis)
 	dummy = p;
 	dummy->next = NULL;
 	if (type == 0) 
-		for (i = 0; i < Node_n; i++)
+        for (i = 0; i < anfis->Node_n; i++)
             if (anfis->config[i][n]){
 				q = (NODE_LIST_T *) malloc(sizeof (NODE_LIST_T));
                 q->content = anfis->node_p[i];
