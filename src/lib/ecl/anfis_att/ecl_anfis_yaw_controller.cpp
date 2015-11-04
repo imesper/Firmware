@@ -201,7 +201,8 @@ float ECL_AnfisYawController::control_bodyrate_impl(const struct ECL_AnfisContro
     _dif_rate_error = _rate_error - _last_rate_error;
     _last_rate_error = _rate_error;
 
-
+    double data[2] = {_rate_error, _dif_rate_error};
+    run(data, anfis);
 
 	return math::constrain(_last_output, -1.0f, 1.0f);
 }

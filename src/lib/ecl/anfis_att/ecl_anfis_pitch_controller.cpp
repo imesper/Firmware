@@ -166,7 +166,8 @@ float ECL_AnfisPitchController::control_bodyrate(const ECL_AnfisControlData &ctl
     _dif_rate_error = _rate_error - _last_rate_error;
     _last_rate_error = _rate_error;
 
-
+    double data[2] = {_rate_error, _dif_rate_error};
+    run(data, anfis);
 	/* Apply PI rate controller and store non-limited output */
 
 //	warnx("pitch: _integrator: %.4f, _integrator_max: %.4f, airspeed %.4f, _k_i %.4f, _k_p: %.4f", (double)_integrator, (double)_integrator_max, (double)airspeed, (double)_k_i, (double)_k_p);

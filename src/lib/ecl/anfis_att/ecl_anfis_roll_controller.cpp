@@ -110,6 +110,8 @@ float ECL_AnfisRollController::control_bodyrate(const ECL_AnfisControlData &ctl_
 	_rate_error = _bodyrate_setpoint - ctl_data.roll_rate; //body angular rate error
     _dif_rate_error = _rate_error - _last_rate_error;
     _last_rate_error = _rate_error;
+    double data[2] = {_rate_error, _dif_rate_error};
+    run(data, anfis);
 
 	/* Apply PI rate controller and store non-limited output */
 
